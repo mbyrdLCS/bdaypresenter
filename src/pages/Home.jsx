@@ -48,7 +48,7 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-8 mt-16">
             <div className="card hover:scale-105 transform transition-all duration-300 fade-in">
-              <div className="text-5xl mb-4">🎂</div>
+              <div className="h-32 mb-6 flex items-center justify-center text-8xl">🎂</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3">Simple Setup</h3>
               <p className="text-gray-600 text-lg">
                 Add names, birthdays, and photos in minutes. No technical knowledge required.
@@ -56,7 +56,7 @@ export default function Home() {
             </div>
 
             <div className="card hover:scale-105 transform transition-all duration-300 fade-in" style={{ animationDelay: '0.1s' }}>
-              <div className="text-5xl mb-4">🎨</div>
+              <div className="h-32 mb-6 flex items-center justify-center text-8xl">🎨</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3">Seasonal Themes</h3>
               <p className="text-gray-600 text-lg">
                 Every month gets a unique look with beautiful seasonal decorations.
@@ -70,24 +70,23 @@ export default function Home() {
               className="card hover:scale-105 transform transition-all duration-300 fade-in cursor-pointer group"
               style={{ animationDelay: '0.2s' }}
             >
-              {/* Modern TV with SignPresenter Logo */}
-              <div className="mb-4 mx-auto w-32 h-28 relative">
-                {/* TV Frame */}
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg shadow-2xl border-4 border-gray-700">
-                  {/* TV Screen - Black background */}
-                  <div className="absolute inset-2 bg-black rounded-md overflow-hidden flex items-center justify-center p-2">
-                    {/* SignPresenter Logo on screen */}
+              {/* TV Mockup with SignPresenter Logo - sized to match emoji height */}
+              <div className="h-32 mb-6 flex items-center justify-center relative">
+                {/* TV Mockup Background */}
+                <div className="relative h-full">
+                  <img
+                    src="/tvclear.png"
+                    alt="TV Display"
+                    className="h-full w-auto group-hover:brightness-110 transition-all"
+                  />
+                  {/* SignPresenter Logo overlaid on screen - adjusted to fit within TV screen */}
+                  <div className="absolute top-[18%] left-[15%] right-[15%] bottom-[28%] flex items-center justify-center p-2">
                     <img
                       src="/signpresenter-logo.png"
                       alt="SignPresenter"
-                      className="w-full h-full object-contain opacity-90 group-hover:opacity-100 transition-opacity"
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform"
                     />
                   </div>
-                </div>
-                {/* TV Stand */}
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
-                  <div className="w-12 h-1 bg-gray-700 rounded-full"></div>
-                  <div className="w-8 h-2 bg-gray-800 rounded-b-lg mx-auto"></div>
                 </div>
               </div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3 group-hover:text-indigo-600 transition-colors">
