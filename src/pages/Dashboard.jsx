@@ -185,7 +185,7 @@ export default function Dashboard() {
         <div className="container mx-auto px-4 py-4 md:py-6 flex justify-between items-center gap-2">
           <div className="flex items-center gap-2 md:gap-3 min-w-0">
             <span className="text-3xl md:text-4xl flex-shrink-0">🎂</span>
-            <h1 className="text-xl md:text-3xl font-bold text-white truncate">BdayPresenter Dashboard</h1>
+            <h1 className="text-xl md:text-3xl font-bold text-white truncate">Birthday Dashboard</h1>
           </div>
           <button
             onClick={handleSignOut}

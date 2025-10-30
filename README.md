@@ -1,6 +1,35 @@
 # 🎂 Birthday Celebration App
 
+**Live at: [bdaypresenter.com](https://bdaypresenter.com)**
+
 A beautiful, multi-tenant SaaS application for displaying team birthdays on digital signage using SignPresenter. Built with React and Supabase.
+
+## 🏗️ Architecture Overview
+
+This is a serverless web application with the following components:
+
+- **Frontend**: React SPA hosted on Vercel (auto-deploys from GitHub)
+- **Backend**: Supabase (managed PostgreSQL database, authentication, and file storage)
+- **Domain**: bdaypresenter.com (GoDaddy DNS → Vercel)
+- **Version Control**: GitHub ([mbyrdLCS/bdaypresenter](https://github.com/mbyrdLCS/bdaypresenter))
+
+### How It Works
+
+1. **User Signs Up** → Creates account in Supabase Auth
+2. **Profile Created** → Automatic trigger creates user profile with unique display URL slug
+3. **Add Team Members** → Stored in Supabase database with photos in Supabase Storage
+4. **Display Page** → Public URL at `/display/{slug}` shows birthdays in real-time
+5. **SignPresenter** → Points to the display URL, auto-updates when data changes (no re-configuration needed!)
+
+### Auto-Updates Feature
+
+The beauty of this system: **Set it once in SignPresenter, and changes auto-update!**
+
+- User adds/edits/deletes birthdays in dashboard
+- Changes are saved to Supabase database
+- Display page fetches fresh data on each load
+- SignPresenter shows updated content automatically
+- No need to re-add URLs or refresh anything in SignPresenter
 
 ## ✨ Features
 
@@ -139,30 +168,68 @@ The app will be available at `http://localhost:5173`
 
 ## 🚢 Deployment
 
-### Deploy to Vercel (Recommended)
+### Current Production Setup
 
-1. Push your code to GitHub
-2. Go to [vercel.com](https://vercel.com)
-3. Click "Import Project"
-4. Select your GitHub repository
-5. Add environment variables:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
-6. Click "Deploy"
+**Live URLs:**
+- Production: https://bdaypresenter.com
+- Vercel URL: https://bdaypresenter.vercel.app
+- GitHub Repo: https://github.com/mbyrdLCS/bdaypresenter
 
-Your app will be live at `https://your-app.vercel.app`
+**Infrastructure:**
+- Hosting: Vercel (Free tier - auto-deploys from GitHub main branch)
+- Database: Supabase (Free tier - hosted PostgreSQL)
+- Domain: GoDaddy (bdaypresenter.com)
+- DNS: Points to Vercel via A record to 216.198.79.1
 
-### Deploy to Netlify
+**Environment Variables in Vercel:**
+- `VITE_SUPABASE_URL`: Your Supabase project URL
+- `VITE_SUPABASE_ANON_KEY`: Your Supabase anonymous key
 
-1. Push your code to GitHub
-2. Go to [netlify.com](https://netlify.com)
-3. Click "Add new site" → "Import an existing project"
-4. Select your GitHub repository
-5. Build settings:
-   - Build command: `npm run build`
-   - Publish directory: `dist`
-6. Add environment variables in Site Settings
-7. Deploy!
+### How to Update the Live Site
+
+**The app uses continuous deployment - it's fully automated!**
+
+1. Make your changes locally
+2. Test locally with `npm run dev`
+3. Commit and push to GitHub:
+   ```bash
+   git add .
+   git commit -m "Description of changes"
+   git push origin main
+   ```
+4. **That's it!** Vercel automatically:
+   - Detects the push to main branch
+   - Runs the build (`npm run build`)
+   - Deploys to production
+   - Updates https://bdaypresenter.com
+   - Usually takes 1-2 minutes
+
+You can watch the deployment progress at: https://vercel.com/dashboard
+
+### Initial Deployment (Already Done)
+
+This section is for reference - the app is already deployed!
+
+1. ✅ Created GitHub repository at `mbyrdLCS/bdaypresenter`
+2. ✅ Connected Vercel to GitHub
+3. ✅ Configured environment variables in Vercel
+4. ✅ Set up custom domain bdaypresenter.com
+5. ✅ Configured DNS in GoDaddy:
+   - A record: @ → 216.198.79.1
+   - CNAME: www → cname.vercel-dns.com
+6. ✅ Updated Supabase redirect URLs to include:
+   - http://localhost:5173/**
+   - https://bdaypresenter.com/**
+   - https://*.vercel.app/**
+
+### Deploy to a New Instance (If Starting Fresh)
+
+1. Fork this repo or create your own
+2. Set up Supabase project and run `database-schema.sql`
+3. Go to [vercel.com](https://vercel.com) and import your repo
+4. Add environment variables in Vercel
+5. Deploy
+6. (Optional) Add custom domain in Vercel settings
 
 ## 📁 Project Structure
 
@@ -196,6 +263,50 @@ birthday-celebration-app/
 - **Authenticated Uploads**: Only authenticated users can upload photos
 - **Secure Storage**: Photos stored in Supabase Storage with proper policies
 
+## 🔄 Common Updates & Maintenance
+
+### Adding New Features
+
+1. Create a new branch:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+2. Make your changes
+3. Test locally
+4. Commit and push:
+   ```bash
+   git add .
+   git commit -m "Add: your feature description"
+   git push origin feature/your-feature-name
+   ```
+5. Merge to main when ready (or create PR on GitHub)
+
+### Updating Styles/Design
+
+- Main styles: `src/index.css` (Tailwind utilities and custom classes)
+- Component styles: Tailwind classes in JSX files
+- Color scheme: Edit gradient colors in component files
+- Seasonal themes: `src/pages/Display.jsx` (line ~100-200)
+
+### Database Changes
+
+1. Make changes in Supabase dashboard SQL editor
+2. Update `database-schema.sql` file to keep it in sync
+3. Document changes in this README
+
+### Environment Variables
+
+**Local development:**
+- Edit `.env` file
+- Restart dev server
+
+**Production (Vercel):**
+1. Go to Vercel dashboard
+2. Select bdaypresenter project
+3. Settings → Environment Variables
+4. Add/Edit variables
+5. Redeploy (or push to trigger auto-deploy)
+
 ## 🐛 Troubleshooting
 
 ### "Supabase credentials not found" warning
@@ -218,8 +329,22 @@ birthday-celebration-app/
 ### Build fails with Tailwind errors
 
 - Make sure `tailwind.config.js` and `postcss.config.js` exist
-- Verify `@tailwind` directives are in `src/index.css`
+- Verify `@import "tailwindcss"` is in `src/index.css`
 - Try deleting `node_modules` and running `npm install` again
+
+### Domain not working
+
+- Check DNS settings in GoDaddy
+- Verify A record points to 216.198.79.1
+- Check Vercel domain configuration
+- DNS changes can take up to 48 hours (usually 5-30 minutes)
+
+### Deployment failed on Vercel
+
+- Check build logs in Vercel dashboard
+- Ensure environment variables are set
+- Verify `package.json` scripts are correct
+- Check for TypeScript/ESLint errors
 
 ## 📝 Database Schema
 

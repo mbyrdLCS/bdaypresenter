@@ -10,7 +10,7 @@ export default function Home() {
         <div className="text-center max-w-4xl mx-auto">
           <div className="text-7xl mb-6 animate-bounce">🎂 🎉</div>
           <h1 className="text-7xl font-bold gradient-text mb-6 fade-in">
-            BdayPresenter
+            Birthday Celebration
           </h1>
           <p className="text-3xl text-gray-700 mb-6 font-semibold slide-in">
             Celebrate your team's birthdays with style
