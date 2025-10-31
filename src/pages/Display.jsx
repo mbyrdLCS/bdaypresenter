@@ -100,27 +100,27 @@ export default function Display() {
   }, [userId])
 
   useEffect(() => {
-    const todaysBirthdays = getTodaysBirthdays()
+    if (teamMembers.length === 0) return
+
+    const todaysBirthdays = teamMembers.filter(
+      (member) =>
+        member.birthday_month === currentMonth && member.birthday_day === currentDay
+    )
 
     if (todaysBirthdays.length > 0) {
-      // Alternate between monthly view and spotlight view
-      // Spotlight shows for 10 seconds, monthly view shows for 5 seconds
-      const timeout = setTimeout(() => {
-        setShowSpotlight((prev) => {
-          const nextShowSpotlight = !prev
+      // Simpler rotation using setInterval for older browsers
+      const interval = setInterval(() => {
+        setShowSpotlight((prev) => !prev)
 
-          // If switching to spotlight and there are multiple people, rotate through them
-          if (nextShowSpotlight && todaysBirthdays.length > 1) {
-            setCurrentSpotlightIndex((prevIndex) => (prevIndex + 1) % todaysBirthdays.length)
-          }
+        // Rotate spotlight index for multiple birthdays
+        if (todaysBirthdays.length > 1) {
+          setCurrentSpotlightIndex((prevIndex) => (prevIndex + 1) % todaysBirthdays.length)
+        }
+      }, 8000) // Switch every 8 seconds
 
-          return nextShowSpotlight
-        })
-      }, showSpotlight ? 10000 : 5000) // 10s for spotlight, 5s for monthly
-
-      return () => clearTimeout(timeout)
+      return () => clearInterval(interval)
     }
-  }, [teamMembers, showSpotlight])
+  }, [teamMembers, currentMonth, currentDay])
 
   const loadTeamMembers = async () => {
     try {
@@ -167,58 +167,61 @@ export default function Display() {
     const spotlightPerson = todaysBirthdays[currentSpotlightIndex]
 
     return (
-      <div className={`min-h-screen bg-gradient-to-br ${theme.bgGradient} flex items-center justify-center p-8`}>
-        <div className="text-center max-w-4xl">
-          {/* Birthday Header */}
-          <div className="mb-8 animate-bounce">
-            <div className="text-8xl mb-4">{theme.emoji} 🎂 🎉</div>
-            <h1 className={`text-7xl font-bold ${theme.accentColor} mb-4`}>
-              Happy Birthday!
-            </h1>
-          </div>
+      <div className={`min-h-screen bg-gradient-to-br ${theme.bgGradient} flex items-center justify-center p-4`}>
+        {/* 16:9 Aspect Ratio Container */}
+        <div className="w-full max-w-7xl mx-auto" style={{ aspectRatio: '16/9' }}>
+          <div className={`h-full flex flex-col justify-center items-center p-6 bg-gradient-to-br ${theme.bgGradient}`}>
+            {/* Birthday Header */}
+            <div className="mb-4 animate-bounce">
+              <div className="text-5xl mb-2">{theme.emoji} 🎂 🎉</div>
+              <h1 className={`text-5xl font-bold ${theme.accentColor}`}>
+                Happy Birthday!
+              </h1>
+            </div>
 
-          {/* Person Photo or Placeholder */}
-          <div className="mb-8 flex justify-center">
-            {spotlightPerson.photo_url ? (
-              <img
-                src={spotlightPerson.photo_url}
-                alt={spotlightPerson.name}
-                className="w-96 h-96 object-cover rounded-full border-8 border-white shadow-2xl"
-              />
-            ) : (
-              <div className="w-96 h-96 rounded-full border-8 border-white shadow-2xl bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center">
-                <span className="text-9xl">🎂</span>
+            {/* Person Photo or Placeholder */}
+            <div className="mb-4 flex justify-center">
+              {spotlightPerson.photo_url ? (
+                <img
+                  src={spotlightPerson.photo_url}
+                  alt={spotlightPerson.name}
+                  className="w-64 h-64 object-cover rounded-full border-8 border-white shadow-2xl"
+                />
+              ) : (
+                <div className="w-64 h-64 rounded-full border-8 border-white shadow-2xl bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center">
+                  <span className="text-8xl">🎂</span>
+                </div>
+              )}
+            </div>
+
+            {/* Person Name */}
+            <h2 className="text-4xl font-bold text-gray-800 mb-2">
+              {spotlightPerson.name}
+            </h2>
+
+            {/* Birthday Date */}
+            <p className="text-2xl text-gray-600 mb-4">
+              {monthNames[spotlightPerson.birthday_month - 1]} {spotlightPerson.birthday_day}
+            </p>
+
+            {/* Multiple birthdays indicator */}
+            {todaysBirthdays.length > 1 && (
+              <div className="flex justify-center gap-2 mt-2">
+                {todaysBirthdays.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-3 h-3 rounded-full ${
+                      index === currentSpotlightIndex ? 'bg-gray-800' : 'bg-gray-300'
+                    }`}
+                  />
+                ))}
               </div>
             )}
-          </div>
 
-          {/* Person Name */}
-          <h2 className="text-6xl font-bold text-gray-800 mb-4">
-            {spotlightPerson.name}
-          </h2>
-
-          {/* Birthday Date */}
-          <p className="text-4xl text-gray-600 mb-8">
-            {monthNames[spotlightPerson.birthday_month - 1]} {spotlightPerson.birthday_day}
-          </p>
-
-          {/* Multiple birthdays indicator */}
-          {todaysBirthdays.length > 1 && (
-            <div className="flex justify-center gap-2 mt-8">
-              {todaysBirthdays.map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-3 h-3 rounded-full ${
-                    index === currentSpotlightIndex ? 'bg-gray-800' : 'bg-gray-300'
-                  }`}
-                />
-              ))}
+            {/* Decorative elements */}
+            <div className="text-4xl mt-4 space-x-2">
+              🎈 🎁 🎊 🎉 🎂 🎈
             </div>
-          )}
-
-          {/* Decorative elements */}
-          <div className="text-6xl mt-12 space-x-4">
-            🎈 🎁 🎊 🎉 🎂 🎈
           </div>
         </div>
       </div>
@@ -227,73 +230,70 @@ export default function Display() {
 
   // Show monthly view (default or when toggled from spotlight)
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${theme.bgGradient} p-8`}>
-      <div className="max-w-7xl mx-auto">
-        {/* Month Header */}
-        <div className="text-center mb-12">
-          <div className="text-6xl mb-4">{theme.emoji}</div>
-          <h1 className={`text-6xl font-bold ${theme.accentColor} mb-2`}>
-            {monthNames[currentMonth - 1]} Birthdays
-          </h1>
-          <p className="text-2xl text-gray-600">{theme.name}</p>
-        </div>
-
-        {/* Birthday List */}
-        {thisMonthsBirthdays.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-xl p-12 text-center">
-            <p className="text-3xl text-gray-600">
-              No birthdays this month! 🎈
-            </p>
+    <div className={`min-h-screen flex items-center justify-center bg-gradient-to-br ${theme.bgGradient} p-4`}>
+      {/* 16:9 Aspect Ratio Container */}
+      <div className="w-full max-w-7xl mx-auto" style={{ aspectRatio: '16/9' }}>
+        <div className={`h-full flex flex-col justify-between p-6 bg-gradient-to-br ${theme.bgGradient}`}>
+          {/* Month Header */}
+          <div className="text-center">
+            <div className="text-4xl mb-2">{theme.emoji}</div>
+            <h1 className={`text-4xl font-bold ${theme.accentColor} mb-1`}>
+              {monthNames[currentMonth - 1]} Birthdays
+            </h1>
+            <p className="text-lg text-gray-600">{theme.name}</p>
           </div>
-        ) : (
-          <div className="bg-white rounded-2xl shadow-xl p-12 max-w-5xl mx-auto">
-            <div className="space-y-6">
-              {thisMonthsBirthdays.map((member, index) => {
-                // Dynamic font size based on number of birthdays
-                // Smaller sizes to fit multiple names on TV screens
-                const getFontSize = () => {
-                  const count = thisMonthsBirthdays.length
-                  if (count <= 2) return 'text-5xl md:text-6xl'
-                  if (count <= 4) return 'text-4xl md:text-5xl'
-                  if (count <= 8) return 'text-3xl md:text-4xl'
-                  return 'text-2xl md:text-3xl'
-                }
 
-                const getDateSize = () => {
-                  const count = thisMonthsBirthdays.length
-                  if (count <= 4) return 'text-2xl md:text-3xl'
-                  return 'text-xl md:text-2xl'
-                }
+          {/* Birthday List */}
+          <div className="flex-1 flex items-center justify-center py-4">
+            {thisMonthsBirthdays.length === 0 ? (
+              <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
+                <p className="text-2xl text-gray-600">
+                  No birthdays this month! 🎈
+                </p>
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-4xl overflow-y-auto max-h-full">
+                <div className="space-y-2">
+                  {thisMonthsBirthdays.map((member, index) => {
+                    // Compact font sizes for 16:9 TV display
+                    const getFontSize = () => {
+                      const count = thisMonthsBirthdays.length
+                      if (count <= 2) return 'text-2xl'
+                      if (count <= 4) return 'text-xl'
+                      if (count <= 8) return 'text-lg'
+                      return 'text-base'
+                    }
 
-                const getSpacing = () => {
-                  const count = thisMonthsBirthdays.length
-                  if (count <= 2) return 'py-6'
-                  if (count <= 4) return 'py-4'
-                  return 'py-3'
-                }
+                    const getDateSize = () => {
+                      const count = thisMonthsBirthdays.length
+                      if (count <= 4) return 'text-lg'
+                      return 'text-base'
+                    }
 
-                return (
-                  <div
-                    key={member.id}
-                    className={`text-center ${getSpacing()} border-b border-gray-200 last:border-b-0`}
-                  >
-                    <h3 className={`${getFontSize()} font-bold text-gray-800 mb-2`}>
-                      {member.name}
-                    </h3>
-                    <p className={`${getDateSize()} ${theme.accentColor} font-semibold`}>
-                      {monthNames[member.birthday_month - 1]} {member.birthday_day}
-                    </p>
-                    <div className="text-3xl md:text-4xl mt-2">🎂</div>
-                  </div>
-                )
-              })}
-            </div>
+                    return (
+                      <div
+                        key={member.id}
+                        className="text-center py-2 border-b border-gray-200 last:border-b-0"
+                      >
+                        <h3 className={`${getFontSize()} font-bold text-gray-800`}>
+                          {member.name}
+                        </h3>
+                        <p className={`${getDateSize()} ${theme.accentColor} font-semibold`}>
+                          {monthNames[member.birthday_month - 1]} {member.birthday_day}
+                        </p>
+                        <div className="text-xl">🎂</div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
           </div>
-        )}
 
-        {/* Footer decorations */}
-        <div className="text-center text-5xl mt-12 space-x-3">
-          🎈 🎁 🎊 🎉 🎂 🎈 🎁 🎊
+          {/* Footer decorations */}
+          <div className="text-center text-3xl space-x-2">
+            🎈 🎁 🎊 🎉 🎂
+          </div>
         </div>
       </div>
     </div>
