@@ -1,7 +1,13 @@
 {
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
   "headers": [
     {
-      "source": "/display/:userId",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "X-Frame-Options",
