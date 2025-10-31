@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -29,6 +29,15 @@ export default function Signup() {
       setTimeout(() => navigate('/dashboard'), 2000)
     }
   }
+
+  // Fire Google Ads conversion tracking when signup succeeds
+  useEffect(() => {
+    if (success && window.gtag) {
+      window.gtag('event', 'conversion', {
+        'send_to': 'AW-10814675679/zFTgCP7czrcbEN-166Qo'
+      });
+    }
+  }, [success]);
 
   if (success) {
     return (
