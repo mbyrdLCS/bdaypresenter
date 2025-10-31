@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { supabase } from '../services/supabase'
+import confetti from 'canvas-confetti'
 
 // Seasonal theme configurations
 const seasonalThemes = {
@@ -121,6 +122,63 @@ export default function Display() {
       return () => clearInterval(interval)
     }
   }, [teamMembers, currentMonth, currentDay])
+
+  // Confetti effect for today's birthday - shoots confetti every 3 seconds during spotlight
+  useEffect(() => {
+    const todaysBirthdays = teamMembers.filter(
+      (member) =>
+        member.birthday_month === currentMonth && member.birthday_day === currentDay
+    )
+
+    if (todaysBirthdays.length > 0 && showSpotlight) {
+      // Initial confetti burst
+      const shootConfetti = () => {
+        const count = 200
+        const defaults = {
+          origin: { y: 0.7 }
+        }
+
+        function fire(particleRatio, opts) {
+          confetti({
+            ...defaults,
+            ...opts,
+            particleCount: Math.floor(count * particleRatio),
+            spread: 100,
+            startVelocity: 30,
+          })
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        })
+        fire(0.2, {
+          spread: 60,
+        })
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        })
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        })
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        })
+      }
+
+      // Shoot confetti immediately and then every 3 seconds
+      shootConfetti()
+      const confettiInterval = setInterval(shootConfetti, 3000)
+
+      return () => clearInterval(confettiInterval)
+    }
+  }, [teamMembers, currentMonth, currentDay, showSpotlight])
 
   const loadTeamMembers = async () => {
     try {
