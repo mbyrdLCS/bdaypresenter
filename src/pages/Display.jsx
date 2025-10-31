@@ -252,36 +252,42 @@ export default function Display() {
                 </p>
               </div>
             ) : (
-              <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-4xl overflow-y-auto max-h-full">
-                <div className="space-y-2">
+              <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-4xl overflow-y-auto max-h-full">
+                <div className="space-y-4">
                   {thisMonthsBirthdays.map((member, index) => {
-                    // Compact font sizes for 16:9 TV display
+                    // Larger font sizes to fill available space
                     const getFontSize = () => {
                       const count = thisMonthsBirthdays.length
-                      if (count <= 2) return 'text-2xl'
-                      if (count <= 4) return 'text-xl'
-                      if (count <= 8) return 'text-lg'
-                      return 'text-base'
+                      if (count <= 2) return 'text-5xl'
+                      if (count <= 4) return 'text-4xl'
+                      if (count <= 8) return 'text-3xl'
+                      return 'text-2xl'
                     }
 
                     const getDateSize = () => {
                       const count = thisMonthsBirthdays.length
-                      if (count <= 4) return 'text-lg'
-                      return 'text-base'
+                      if (count <= 4) return 'text-3xl'
+                      return 'text-2xl'
+                    }
+
+                    const getEmojiSize = () => {
+                      const count = thisMonthsBirthdays.length
+                      if (count <= 4) return 'text-4xl'
+                      return 'text-3xl'
                     }
 
                     return (
                       <div
                         key={member.id}
-                        className="text-center py-2 border-b border-gray-200 last:border-b-0"
+                        className="text-center py-3 border-b border-gray-200 last:border-b-0"
                       >
-                        <h3 className={`${getFontSize()} font-bold text-gray-800`}>
+                        <h3 className={`${getFontSize()} font-bold text-gray-800 mb-2`}>
                           {member.name}
                         </h3>
-                        <p className={`${getDateSize()} ${theme.accentColor} font-semibold`}>
+                        <p className={`${getDateSize()} ${theme.accentColor} font-semibold mb-2`}>
                           {monthNames[member.birthday_month - 1]} {member.birthday_day}
                         </p>
-                        <div className="text-xl">🎂</div>
+                        <div className={getEmojiSize()}>🎂</div>
                       </div>
                     )
                   })}
