@@ -239,13 +239,13 @@ export default function Display() {
 
         {/* Birthday List */}
         {thisMonthsBirthdays.length === 0 ? (
-          <div className="bg-white/80 backdrop-blur rounded-2xl shadow-xl p-12 text-center">
+          <div className="bg-white rounded-2xl shadow-xl p-12 text-center">
             <p className="text-3xl text-gray-600">
               No birthdays this month! 🎈
             </p>
           </div>
         ) : (
-          <div className="bg-white/90 backdrop-blur rounded-2xl shadow-xl p-12 max-w-5xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-xl p-12 max-w-5xl mx-auto">
             <div className="space-y-6">
               {thisMonthsBirthdays.map((member, index) => {
                 // Dynamic font size based on number of birthdays
