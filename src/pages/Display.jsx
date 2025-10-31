@@ -252,46 +252,62 @@ export default function Display() {
                 </p>
               </div>
             ) : (
-              <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-4xl overflow-y-auto max-h-full">
-                <div className="space-y-4">
-                  {thisMonthsBirthdays.map((member, index) => {
-                    // Larger font sizes to fill available space
-                    const getFontSize = () => {
-                      const count = thisMonthsBirthdays.length
-                      if (count <= 2) return 'text-5xl'
-                      if (count <= 4) return 'text-4xl'
-                      if (count <= 8) return 'text-3xl'
-                      return 'text-2xl'
-                    }
+              <div className="bg-white rounded-2xl shadow-xl p-8 w-full h-full max-w-6xl flex items-center justify-center">
+                {(() => {
+                  const count = thisMonthsBirthdays.length
 
-                    const getDateSize = () => {
-                      const count = thisMonthsBirthdays.length
-                      if (count <= 4) return 'text-3xl'
-                      return 'text-2xl'
-                    }
+                  // Determine grid layout based on number of birthdays
+                  const getGridCols = () => {
+                    if (count === 1) return 'grid-cols-1'
+                    if (count === 2) return 'grid-cols-2'
+                    if (count === 3) return 'grid-cols-3'
+                    if (count === 4) return 'grid-cols-2'
+                    if (count <= 6) return 'grid-cols-3'
+                    if (count <= 9) return 'grid-cols-3'
+                    return 'grid-cols-4'
+                  }
 
-                    const getEmojiSize = () => {
-                      const count = thisMonthsBirthdays.length
-                      if (count <= 4) return 'text-4xl'
-                      return 'text-3xl'
-                    }
+                  // Font sizes based on count
+                  const getFontSize = () => {
+                    if (count === 1) return 'text-6xl'
+                    if (count === 2) return 'text-5xl'
+                    if (count === 3) return 'text-4xl'
+                    if (count <= 6) return 'text-3xl'
+                    if (count <= 9) return 'text-2xl'
+                    return 'text-xl'
+                  }
 
-                    return (
-                      <div
-                        key={member.id}
-                        className="text-center py-3 border-b border-gray-200 last:border-b-0"
-                      >
-                        <h3 className={`${getFontSize()} font-bold text-gray-800 mb-2`}>
-                          {member.name}
-                        </h3>
-                        <p className={`${getDateSize()} ${theme.accentColor} font-semibold mb-2`}>
-                          {monthNames[member.birthday_month - 1]} {member.birthday_day}
-                        </p>
-                        <div className={getEmojiSize()}>🎂</div>
-                      </div>
-                    )
-                  })}
-                </div>
+                  const getDateSize = () => {
+                    if (count <= 3) return 'text-3xl'
+                    if (count <= 6) return 'text-2xl'
+                    return 'text-xl'
+                  }
+
+                  const getEmojiSize = () => {
+                    if (count <= 3) return 'text-4xl'
+                    if (count <= 6) return 'text-3xl'
+                    return 'text-2xl'
+                  }
+
+                  return (
+                    <div className={`grid ${getGridCols()} gap-6 w-full`}>
+                      {thisMonthsBirthdays.map((member) => (
+                        <div
+                          key={member.id}
+                          className="text-center p-4"
+                        >
+                          <h3 className={`${getFontSize()} font-bold text-gray-800 mb-2`}>
+                            {member.name}
+                          </h3>
+                          <p className={`${getDateSize()} ${theme.accentColor} font-semibold mb-2`}>
+                            {monthNames[member.birthday_month - 1]} {member.birthday_day}
+                          </p>
+                          <div className={getEmojiSize()}>🎂</div>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                })()}
               </div>
             )}
           </div>
