@@ -250,20 +250,26 @@ export default function Display() {
             <div className="space-y-6">
               {thisMonthsBirthdays.map((member, index) => {
                 // Dynamic font size based on number of birthdays
-                // 1-3 people: huge text, 4-6: large, 7-10: medium, 11+: smaller
+                // Smaller sizes to fit multiple names on TV screens
                 const getFontSize = () => {
                   const count = thisMonthsBirthdays.length
-                  if (count <= 3) return 'text-7xl md:text-8xl'
-                  if (count <= 6) return 'text-5xl md:text-6xl'
-                  if (count <= 10) return 'text-4xl md:text-5xl'
-                  return 'text-3xl md:text-4xl'
+                  if (count <= 2) return 'text-5xl md:text-6xl'
+                  if (count <= 4) return 'text-4xl md:text-5xl'
+                  if (count <= 8) return 'text-3xl md:text-4xl'
+                  return 'text-2xl md:text-3xl'
+                }
+
+                const getDateSize = () => {
+                  const count = thisMonthsBirthdays.length
+                  if (count <= 4) return 'text-2xl md:text-3xl'
+                  return 'text-xl md:text-2xl'
                 }
 
                 const getSpacing = () => {
                   const count = thisMonthsBirthdays.length
-                  if (count <= 3) return 'py-8'
-                  if (count <= 6) return 'py-6'
-                  return 'py-4'
+                  if (count <= 2) return 'py-6'
+                  if (count <= 4) return 'py-4'
+                  return 'py-3'
                 }
 
                 return (
@@ -271,13 +277,13 @@ export default function Display() {
                     key={member.id}
                     className={`text-center ${getSpacing()} border-b border-gray-200 last:border-b-0`}
                   >
-                    <h3 className={`${getFontSize()} font-bold text-gray-800 mb-3`}>
+                    <h3 className={`${getFontSize()} font-bold text-gray-800 mb-2`}>
                       {member.name}
                     </h3>
-                    <p className={`text-2xl md:text-3xl ${theme.accentColor} font-semibold`}>
+                    <p className={`${getDateSize()} ${theme.accentColor} font-semibold`}>
                       {monthNames[member.birthday_month - 1]} {member.birthday_day}
                     </p>
-                    <div className="text-4xl md:text-5xl mt-3">🎂</div>
+                    <div className="text-3xl md:text-4xl mt-2">🎂</div>
                   </div>
                 )
               })}
