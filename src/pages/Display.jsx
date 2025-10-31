@@ -104,7 +104,8 @@ export default function Display() {
 
     if (todaysBirthdays.length > 0) {
       // Alternate between monthly view and spotlight view
-      const interval = setInterval(() => {
+      // Spotlight shows for 10 seconds, monthly view shows for 5 seconds
+      const timeout = setTimeout(() => {
         setShowSpotlight((prev) => {
           const nextShowSpotlight = !prev
 
@@ -115,9 +116,9 @@ export default function Display() {
 
           return nextShowSpotlight
         })
-      }, showSpotlight ? 5000 : 10000) // 5s for spotlight, 10s for monthly
+      }, showSpotlight ? 10000 : 5000) // 10s for spotlight, 5s for monthly
 
-      return () => clearInterval(interval)
+      return () => clearTimeout(timeout)
     }
   }, [teamMembers, showSpotlight])
 
