@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { supabase } from '../services/supabase'
 import confetti from 'canvas-confetti'
 
@@ -86,13 +86,16 @@ const monthNames = [
 
 export default function Display() {
   const { userId } = useParams()
+  const [searchParams] = useSearchParams()
   const [teamMembers, setTeamMembers] = useState([])
   const [loading, setLoading] = useState(true)
   const [currentSpotlightIndex, setCurrentSpotlightIndex] = useState(0)
   const [showSpotlight, setShowSpotlight] = useState(true)
 
   const today = new Date()
-  const currentMonth = today.getMonth() + 1
+  // Allow month override via URL parameter (e.g., ?month=12 for December)
+  const previewMonth = searchParams.get('month')
+  const currentMonth = previewMonth ? parseInt(previewMonth) : today.getMonth() + 1
   const currentDay = today.getDate()
   const theme = seasonalThemes[currentMonth]
 
