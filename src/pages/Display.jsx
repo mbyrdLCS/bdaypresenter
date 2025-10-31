@@ -168,13 +168,13 @@ export default function Display() {
 
     return (
       <div className={`min-h-screen bg-gradient-to-br ${theme.bgGradient} flex items-center justify-center p-4`}>
-        {/* 16:9 Aspect Ratio Container */}
+        {/* 16:9 Aspect Ratio Container with TV Safe Area */}
         <div className="w-full max-w-7xl mx-auto" style={{ aspectRatio: '16/9' }}>
-          <div className={`h-full flex flex-col justify-center items-center p-6 bg-gradient-to-br ${theme.bgGradient}`}>
+          <div className={`h-full flex flex-col justify-center items-center px-12 py-10 bg-gradient-to-br ${theme.bgGradient}`}>
             {/* Birthday Header */}
-            <div className="mb-4 animate-bounce">
-              <div className="text-5xl mb-2">{theme.emoji} 🎂 🎉</div>
-              <h1 className={`text-5xl font-bold ${theme.accentColor}`}>
+            <div className="mb-3 animate-bounce">
+              <div className="text-4xl mb-1">{theme.emoji} 🎂 🎉</div>
+              <h1 className={`text-4xl font-bold ${theme.accentColor}`}>
                 Happy Birthday!
               </h1>
             </div>
@@ -219,8 +219,8 @@ export default function Display() {
             )}
 
             {/* Decorative elements */}
-            <div className="text-4xl mt-4 space-x-2">
-              🎈 🎁 🎊 🎉 🎂 🎈
+            <div className="text-3xl mt-2 space-x-2">
+              🎈 🎁 🎊 🎉 🎂
             </div>
           </div>
         </div>
@@ -231,16 +231,16 @@ export default function Display() {
   // Show monthly view (default or when toggled from spotlight)
   return (
     <div className={`min-h-screen flex items-center justify-center bg-gradient-to-br ${theme.bgGradient} p-4`}>
-      {/* 16:9 Aspect Ratio Container */}
+      {/* 16:9 Aspect Ratio Container with TV Safe Area */}
       <div className="w-full max-w-7xl mx-auto" style={{ aspectRatio: '16/9' }}>
-        <div className={`h-full flex flex-col justify-between p-6 bg-gradient-to-br ${theme.bgGradient}`}>
+        <div className={`h-full flex flex-col justify-between px-12 py-10 bg-gradient-to-br ${theme.bgGradient}`}>
           {/* Month Header */}
           <div className="text-center">
-            <div className="text-4xl mb-2">{theme.emoji}</div>
-            <h1 className={`text-4xl font-bold ${theme.accentColor} mb-1`}>
+            <div className="text-3xl mb-1">{theme.emoji}</div>
+            <h1 className={`text-3xl font-bold ${theme.accentColor} mb-1`}>
               {monthNames[currentMonth - 1]} Birthdays
             </h1>
-            <p className="text-lg text-gray-600">{theme.name}</p>
+            <p className="text-base text-gray-600">{theme.name}</p>
           </div>
 
           {/* Birthday List */}
@@ -291,7 +291,7 @@ export default function Display() {
           </div>
 
           {/* Footer decorations */}
-          <div className="text-center text-3xl space-x-2">
+          <div className="text-center text-2xl space-x-2">
             🎈 🎁 🎊 🎉 🎂
           </div>
         </div>
