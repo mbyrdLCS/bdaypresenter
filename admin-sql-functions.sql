@@ -19,13 +19,13 @@ BEGIN
   RETURN QUERY
   SELECT
     au.id,
-    au.email,
-    p.organization_name,
-    p.display_url_slug,
+    au.email::TEXT,
+    COALESCE(p.organization_name, 'Unknown')::TEXT,
+    COALESCE(p.display_url_slug, '')::TEXT,
     au.created_at,
-    au.last_sign_in_at as last_sign_in,
-    COUNT(DISTINCT tm.id) as birthday_count,
-    COUNT(DISTINCT CASE WHEN tm.photo_url IS NOT NULL THEN tm.id END) as photo_count
+    au.last_sign_in_at,
+    COALESCE(COUNT(DISTINCT tm.id), 0)::BIGINT as birthday_count,
+    COALESCE(COUNT(DISTINCT CASE WHEN tm.photo_url IS NOT NULL AND tm.photo_url != '' THEN tm.id END), 0)::BIGINT as photo_count
   FROM auth.users au
   LEFT JOIN profiles p ON p.id = au.id
   LEFT JOIN team_members tm ON tm.user_id = au.id
