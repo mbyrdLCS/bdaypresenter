@@ -1,8 +1,13 @@
 # 🎂 Birthday Celebration App
 
-**Live at: [bdaypresenter.com](https://bdaypresenter.com)**
-
 A beautiful, multi-tenant SaaS application for displaying team birthdays on digital signage using SignPresenter. Built with React and Supabase.
+
+**Live Demo:** [bdaypresenter.com](https://bdaypresenter.com)
+
+[![License](https://img.shields.io/badge/License-Non--Commercial-blue.svg)](LICENSE)
+[![React](https://img.shields.io/badge/React-18.x-blue)](https://reactjs.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-Backend-green)](https://supabase.com/)
+[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black)](https://vercel.com/)
 
 ## 🏗️ Architecture Overview
 
@@ -355,18 +360,55 @@ See `database-schema.sql` for the complete schema with:
 - Automatic triggers
 - Storage bucket configuration
 
-## 🤝 Contributing
-
-This is a free service for SignPresenter users. If you find bugs or have feature requests, please open an issue!
-
 ## 📄 License
 
-MIT License - feel free to use this for your organization!
+This project is licensed under a **Non-Commercial License with Attribution Requirement**.
 
-## 🎉 Credits
+**Key Points:**
+- ✅ Free to use for organizations and non-profits
+- ✅ Can modify and adapt for your needs
+- ✅ Must keep SignPresenter.com references
+- ❌ Cannot sell or use commercially
+- ❌ Cannot remove attribution
 
-Built with ❤️ for the SignPresenter community.
+See [LICENSE](LICENSE) file for full details.
+
+For commercial licensing inquiries, contact: mike@signpresenter.com
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+### Development Guidelines
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Test your changes thoroughly
+4. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+5. Push to the branch (`git push origin feature/AmazingFeature`)
+6. Open a Pull Request
+
+## 💡 Support & Questions
+
+- **Issues**: [GitHub Issues](https://github.com/mbyrdLCS/bdaypresenter/issues)
+- **Email**: mike@signpresenter.com
+- **Live Demo**: [bdaypresenter.com](https://bdaypresenter.com)
+- **SignPresenter Docs**: [support.signpresenter.com](https://support.signpresenter.com/)
+
+## 🙏 Acknowledgments
+
+- Built with ❤️ for organizations celebrating their teams
+- Powered by [SignPresenter](https://www.signpresenter.com/) for digital signage displays
+- Thanks to all contributors and organizations using this system
+
+## 📈 Roadmap
+
+- [ ] Custom theme builder
+- [ ] Work anniversary tracking
+- [ ] Team milestones and achievements
+- [ ] Photo slideshow mode
+- [ ] Multiple team support per organization
+- [ ] Birthday reminder notifications
 
 ---
 
-**Questions or need help?** Open an issue or refer to the [SignPresenter documentation](https://support.signpresenter.com/).
+**Made with ❤️ for the SignPresenter community**
