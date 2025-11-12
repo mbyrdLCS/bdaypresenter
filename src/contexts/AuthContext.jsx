@@ -23,8 +23,14 @@ export const AuthProvider = ({ children }) => {
     })
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // Don't set user as authenticated during password recovery
+      // This allows the ResetPassword page to show the form
+      if (event === 'PASSWORD_RECOVERY') {
+        setUser(null)
+      } else {
+        setUser(session?.user ?? null)
+      }
       setLoading(false)
     })
 

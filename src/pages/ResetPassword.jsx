@@ -12,13 +12,24 @@ export default function ResetPassword() {
 
   useEffect(() => {
     // Check if we have a recovery token in the URL
-    const hashParams = new URLSearchParams(window.location.hash.substring(1))
-    const accessToken = hashParams.get('access_token')
-    const type = hashParams.get('type')
+    const checkRecoveryToken = async () => {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1))
+      const accessToken = hashParams.get('access_token')
+      const type = hashParams.get('type')
 
-    if (!accessToken || type !== 'recovery') {
-      setError('Invalid or expired reset link. Please request a new password reset.')
+      if (!accessToken || type !== 'recovery') {
+        setError('Invalid or expired reset link. Please request a new password reset.')
+        return
+      }
+
+      // Verify the session is valid
+      const { data: { session }, error } = await supabase.auth.getSession()
+      if (error || !session) {
+        setError('Invalid or expired reset link. Please request a new password reset.')
+      }
     }
+
+    checkRecoveryToken()
   }, [])
 
   const handleSubmit = async (e) => {
@@ -50,6 +61,8 @@ export default function ResetPassword() {
       setError(error.message)
     } else {
       setSuccess(true)
+      // Sign out to clear the recovery session
+      await supabase.auth.signOut()
       // Redirect to login after 2 seconds
       setTimeout(() => {
         navigate('/login')
