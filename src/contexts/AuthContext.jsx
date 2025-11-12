@@ -16,9 +16,21 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Check if we're on the password reset page
+    const isResetPasswordPage = window.location.pathname === '/reset-password'
+    const hashParams = new URLSearchParams(window.location.hash.substring(1))
+    const accessToken = hashParams.get('access_token')
+    const type = hashParams.get('type')
+    const isRecoveryLink = accessToken && type === 'recovery'
+
     // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
+      // Don't set user if we're on reset password page with recovery token
+      if (isResetPasswordPage && isRecoveryLink) {
+        setUser(null)
+      } else {
+        setUser(session?.user ?? null)
+      }
       setLoading(false)
     })
 
