@@ -8,24 +8,41 @@ export default function ResetPassword() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [hasValidToken, setHasValidToken] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
+    // Prevent any automatic redirects while on this page
+    const preventRedirect = () => {
+      // This component should always be shown when user lands here
+      window.history.replaceState(null, '', window.location.pathname + window.location.hash)
+    }
+
+    preventRedirect()
+
     // Check if we have a recovery token in the URL
     const checkRecoveryToken = async () => {
       const hashParams = new URLSearchParams(window.location.hash.substring(1))
       const accessToken = hashParams.get('access_token')
       const type = hashParams.get('type')
 
+      console.log('Reset Password - Token check:', { accessToken: !!accessToken, type })
+
       if (!accessToken || type !== 'recovery') {
         setError('Invalid or expired reset link. Please request a new password reset.')
+        setHasValidToken(false)
         return
       }
 
       // Verify the session is valid
       const { data: { session }, error } = await supabase.auth.getSession()
+      console.log('Reset Password - Session check:', { hasSession: !!session, error })
+
       if (error || !session) {
         setError('Invalid or expired reset link. Please request a new password reset.')
+        setHasValidToken(false)
+      } else {
+        setHasValidToken(true)
       }
     }
 

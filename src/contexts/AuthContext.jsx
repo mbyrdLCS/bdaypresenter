@@ -17,30 +17,41 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Check if we're on the password reset page
-    const isResetPasswordPage = window.location.pathname === '/reset-password'
-    const hashParams = new URLSearchParams(window.location.hash.substring(1))
-    const accessToken = hashParams.get('access_token')
-    const type = hashParams.get('type')
-    const isRecoveryLink = accessToken && type === 'recovery'
+    const checkSession = async () => {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1))
+      const type = hashParams.get('type')
+      const isRecoveryToken = type === 'recovery'
 
-    // Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      // Don't set user if we're on reset password page with recovery token
-      if (isResetPasswordPage && isRecoveryLink) {
+      // If we have a recovery token, don't set the user yet
+      if (isRecoveryToken) {
         setUser(null)
-      } else {
-        setUser(session?.user ?? null)
+        setLoading(false)
+        return
       }
+
+      // Otherwise, check for normal session
+      const { data: { session } } = await supabase.auth.getSession()
+      setUser(session?.user ?? null)
       setLoading(false)
-    })
+    }
+
+    checkSession()
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth event:', event, 'Session:', session)
+
+      // Check if we have a recovery token in the URL
+      const hashParams = new URLSearchParams(window.location.hash.substring(1))
+      const type = hashParams.get('type')
+
       // Don't set user as authenticated during password recovery
       // This allows the ResetPassword page to show the form
-      if (event === 'PASSWORD_RECOVERY') {
+      if (event === 'PASSWORD_RECOVERY' || type === 'recovery') {
         setUser(null)
-      } else {
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null)
+      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
         setUser(session?.user ?? null)
       }
       setLoading(false)
