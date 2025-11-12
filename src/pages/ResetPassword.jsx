@@ -26,8 +26,6 @@ export default function ResetPassword() {
       const accessToken = hashParams.get('access_token')
       const type = hashParams.get('type')
 
-      console.log('Reset Password - Token check:', { accessToken: !!accessToken, type })
-
       if (!accessToken || type !== 'recovery') {
         setError('Invalid or expired reset link. Please request a new password reset.')
         setHasValidToken(false)
@@ -36,7 +34,6 @@ export default function ResetPassword() {
 
       // Verify the session is valid
       const { data: { session }, error } = await supabase.auth.getSession()
-      console.log('Reset Password - Session check:', { hasSession: !!session, error })
 
       if (error || !session) {
         setError('Invalid or expired reset link. Please request a new password reset.')
