@@ -22,10 +22,24 @@ export const AuthProvider = ({ children }) => {
       const type = hashParams.get('type')
       const isRecoveryToken = type === 'recovery'
 
+      console.log('AuthContext - Initial check:', {
+        pathname: window.location.pathname,
+        hash: window.location.hash,
+        type,
+        isRecoveryToken
+      })
+
       // If we have a recovery token, don't set the user yet
       if (isRecoveryToken) {
+        console.log('AuthContext - Recovery token detected, keeping user null')
         setUser(null)
         setLoading(false)
+
+        // IMPORTANT: If we're not already on /reset-password, redirect there
+        if (window.location.pathname !== '/reset-password') {
+          console.log('AuthContext - Redirecting to /reset-password with token')
+          window.location.href = '/reset-password' + window.location.hash
+        }
         return
       }
 
@@ -48,7 +62,14 @@ export const AuthProvider = ({ children }) => {
       // Don't set user as authenticated during password recovery
       // This allows the ResetPassword page to show the form
       if (event === 'PASSWORD_RECOVERY' || type === 'recovery') {
+        console.log('AuthContext - Recovery event/token, keeping user null')
         setUser(null)
+
+        // Redirect to reset-password page if not already there
+        if (window.location.pathname !== '/reset-password') {
+          console.log('AuthContext - Redirecting to /reset-password from auth event')
+          window.location.href = '/reset-password' + window.location.hash
+        }
       } else if (event === 'SIGNED_OUT') {
         setUser(null)
       } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
