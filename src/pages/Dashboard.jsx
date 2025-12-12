@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../services/supabase'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -29,6 +29,7 @@ export default function Dashboard() {
 
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
+  const formRef = useRef(null)
 
   useEffect(() => {
     loadProfile()
@@ -146,6 +147,10 @@ export default function Dashboard() {
       photo_url: member.photo_url || '',
     })
     setShowAddForm(true)
+    // Scroll to form after state updates
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
   }
 
   const handleDelete = async (id) => {
@@ -326,7 +331,7 @@ export default function Dashboard() {
 
         {/* Add/Edit Form */}
         {showAddForm && (
-          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100 fade-in">
+          <div ref={formRef} className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100 fade-in">
             <div className="flex items-center gap-3 mb-6">
               <span className="text-3xl">{editingMember ? '✏️' : '➕'}</span>
               <h3 className="text-2xl font-bold gradient-text">
@@ -399,7 +404,7 @@ export default function Dashboard() {
                 </label>
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/*,.heic,.heif"
                   onChange={handleFileUpload}
                   disabled={uploading}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
