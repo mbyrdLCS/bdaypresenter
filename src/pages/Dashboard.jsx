@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../services/supabase'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import heic2any from 'heic2any'
 
 export default function Dashboard() {
   const { user, signOut } = useAuth()
@@ -91,6 +90,8 @@ export default function Dashboard() {
       // Convert HEIC/HEIF to JPEG for browser compatibility
       if (fileExt === 'heic' || fileExt === 'heif') {
         try {
+          // Dynamic import for better Vite/WASM compatibility
+          const heic2any = (await import('heic2any')).default
           const convertedBlob = await heic2any({
             blob: file,
             toType: 'image/jpeg',
