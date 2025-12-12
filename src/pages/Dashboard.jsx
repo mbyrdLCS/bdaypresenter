@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../services/supabase'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import heic2any from 'heic2any'
 
 export default function Dashboard() {
   const { user, signOut } = useAuth()
@@ -84,8 +85,29 @@ export default function Dashboard() {
         return
       }
 
-      const file = event.target.files[0]
-      const fileExt = file.name.split('.').pop()
+      let file = event.target.files[0]
+      let fileExt = file.name.split('.').pop().toLowerCase()
+
+      // Convert HEIC/HEIF to JPEG for browser compatibility
+      if (fileExt === 'heic' || fileExt === 'heif') {
+        try {
+          const convertedBlob = await heic2any({
+            blob: file,
+            toType: 'image/jpeg',
+            quality: 0.9
+          })
+          // heic2any may return an array for multi-image HEIC files
+          const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob
+          file = new File([blob], file.name.replace(/\.(heic|heif)$/i, '.jpg'), {
+            type: 'image/jpeg'
+          })
+          fileExt = 'jpg'
+        } catch (conversionError) {
+          console.error('HEIC conversion failed:', conversionError)
+          throw new Error('Failed to convert HEIC image. Please try a different photo.')
+        }
+      }
+
       const fileName = `${user.id}/${Math.random()}.${fileExt}`
 
       const { data, error: uploadError } = await supabase.storage
