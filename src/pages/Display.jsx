@@ -25,44 +25,50 @@ export default function Display() {
     loadData()
   }, [userId])
 
-  const CACHE_TTL = 4 * 60 * 60 * 1000 // 4 hours
   const cacheKey = `bdp_display_${userId}`
-  // Skip cache when using preview params so changes show immediately
   const isPreview = !!(templateOverride || previewMonth)
 
   const loadData = async () => {
-    // Try cache first (non-preview only)
-    if (!isPreview) {
-      try {
-        const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null')
-        if (cached && Date.now() - cached.cachedAt < CACHE_TTL) {
-          setTeamMembers(cached.members)
-          setTemplateId(cached.templateId || DEFAULT_TEMPLATE)
-          setLoading(false)
-          return
-        }
-      } catch (e) { /* ignore — fall through to fetch */ }
-    }
-
-    // Fetch fresh from Supabase
     try {
-      const [membersRes, profileRes] = await Promise.all([
-        supabase.from('team_members').select('*').eq('user_id', userId)
-          .order('birthday_month', { ascending: true }).order('birthday_day', { ascending: true }),
-        supabase.from('profiles').select('display_template').eq('id', userId).single()
-      ])
-      const members = membersRes.data || []
-      const tmplId = profileRes.data?.display_template || DEFAULT_TEMPLATE
-      setTeamMembers(members)
+      // Always fetch the lightweight profile row first (template + updated_at)
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('display_template, updated_at')
+        .eq('id', userId)
+        .single()
+
+      const tmplId = profileData?.display_template || DEFAULT_TEMPLATE
       if (templateOverride && TEMPLATES[templateOverride]) {
         setTemplateId(templateOverride)
       } else {
         setTemplateId(tmplId)
       }
-      // Save to cache
+
+      // Check if cached members are still fresh
       if (!isPreview) {
         try {
-          localStorage.setItem(cacheKey, JSON.stringify({ members, templateId: tmplId, cachedAt: Date.now() }))
+          const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null')
+          const profileUpdatedAt = profileData?.updated_at ? new Date(profileData.updated_at).getTime() : 0
+          if (cached && profileUpdatedAt <= cached.cachedAt) {
+            // Profile hasn't changed since we last cached — use cached members
+            setTeamMembers(cached.members)
+            setLoading(false)
+            return
+          }
+        } catch (e) { /* fall through to fresh fetch */ }
+      }
+
+      // Fetch fresh members (profile changed or no cache)
+      const { data: members } = await supabase
+        .from('team_members').select('*').eq('user_id', userId)
+        .order('birthday_month', { ascending: true }).order('birthday_day', { ascending: true })
+
+      const freshMembers = members || []
+      setTeamMembers(freshMembers)
+
+      if (!isPreview) {
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify({ members: freshMembers, templateId: tmplId, cachedAt: Date.now() }))
         } catch (e) { /* localStorage full or unavailable */ }
       }
     } catch (err) {

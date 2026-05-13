@@ -131,6 +131,10 @@ export default function Dashboard() {
     }
   }
 
+  // Touch profiles.updated_at so the display page cache auto-invalidates
+  const touchProfile = () =>
+    supabase.from('profiles').update({ updated_at: new Date().toISOString() }).eq('id', user.id)
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -153,6 +157,7 @@ export default function Dashboard() {
         if (error) throw error
       }
 
+      await touchProfile()
       // Reset form
       setFormData({ name: '', birthday_month: '', birthday_day: '', photo_url: '' })
       setShowAddForm(false)
@@ -188,6 +193,7 @@ export default function Dashboard() {
         .eq('id', id)
 
       if (error) throw error
+      await touchProfile()
       loadTeamMembers()
     } catch (error) {
       setError(error.message)
