@@ -10,12 +10,18 @@ function parseICS(text) {
   for (const block of blocks) {
     const summaryMatch = block.match(/^SUMMARY[^:]*:(.+)/im)
     if (!summaryMatch) continue
-    let name = summaryMatch[1].trim()
+    const rawSummary = summaryMatch[1].trim()
+
+    // Only include events that mention a birthday variation in the original title
+    const birthdayKeyword = /birthday|birth-day|b-day|bday|b'day/i
+    if (!birthdayKeyword.test(rawSummary)) continue
+
+    let name = rawSummary
     // Strip common birthday suffixes/prefixes
     name = name
-      .replace(/'s [Bb]irthday.*$/, '')
-      .replace(/^[Bb]irthday[:\s\-]+/i, '')
-      .replace(/\s*[Bb]irthday\s*$/i, '')
+      .replace(/'s (birthday|birth-day|b-day|bday).*/i, '')
+      .replace(/^(birthday|birth-day|b-day|bday)[:\s\-]*/i, '')
+      .replace(/\s*(birthday|birth-day|b-day|bday)\s*$/i, '')
       .trim()
     if (!name) continue
 
