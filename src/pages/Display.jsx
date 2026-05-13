@@ -25,18 +25,45 @@ export default function Display() {
     loadData()
   }, [userId])
 
+  const CACHE_TTL = 4 * 60 * 60 * 1000 // 4 hours
+  const cacheKey = `bdp_display_${userId}`
+  // Skip cache when using preview params so changes show immediately
+  const isPreview = !!(templateOverride || previewMonth)
+
   const loadData = async () => {
+    // Try cache first (non-preview only)
+    if (!isPreview) {
+      try {
+        const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null')
+        if (cached && Date.now() - cached.cachedAt < CACHE_TTL) {
+          setTeamMembers(cached.members)
+          setTemplateId(cached.templateId || DEFAULT_TEMPLATE)
+          setLoading(false)
+          return
+        }
+      } catch (e) { /* ignore — fall through to fetch */ }
+    }
+
+    // Fetch fresh from Supabase
     try {
       const [membersRes, profileRes] = await Promise.all([
         supabase.from('team_members').select('*').eq('user_id', userId)
           .order('birthday_month', { ascending: true }).order('birthday_day', { ascending: true }),
         supabase.from('profiles').select('display_template').eq('id', userId).single()
       ])
-      if (membersRes.data) setTeamMembers(membersRes.data)
-      if (!templateOverride && profileRes.data?.display_template) {
-        setTemplateId(profileRes.data.display_template)
-      } else if (templateOverride && TEMPLATES[templateOverride]) {
+      const members = membersRes.data || []
+      const tmplId = profileRes.data?.display_template || DEFAULT_TEMPLATE
+      setTeamMembers(members)
+      if (templateOverride && TEMPLATES[templateOverride]) {
         setTemplateId(templateOverride)
+      } else {
+        setTemplateId(tmplId)
+      }
+      // Save to cache
+      if (!isPreview) {
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify({ members, templateId: tmplId, cachedAt: Date.now() }))
+        } catch (e) { /* localStorage full or unavailable */ }
       }
     } catch (err) {
       console.error(err)
