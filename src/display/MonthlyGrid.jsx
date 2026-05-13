@@ -54,7 +54,7 @@ export default function MonthlyGrid({ members, cardBg, nameColor, dateColor }) {
       {members.map(m => (
         <div
           key={m.id}
-          className={`${cardBg} rounded-2xl flex flex-col items-center justify-center gap-3 p-6 min-h-0`}
+          className={`${cardBg} rounded-2xl flex flex-col items-center justify-center gap-3 p-6 min-h-0 overflow-hidden`}
         >
           <div className={`${avatarClass} flex-shrink-0`}>
             <PersonAvatar photoUrl={m.photo_url} name={m.name} className="w-full h-full" />
