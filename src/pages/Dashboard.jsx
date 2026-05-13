@@ -4,6 +4,45 @@ import { supabase } from '../services/supabase'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { TEMPLATES } from '../display/index'
 
+function parseICS(text) {
+  const events = []
+  const blocks = text.split('BEGIN:VEVENT').slice(1)
+  for (const block of blocks) {
+    const summaryMatch = block.match(/^SUMMARY[^:]*:(.+)/im)
+    if (!summaryMatch) continue
+    let name = summaryMatch[1].trim()
+    // Strip common birthday suffixes/prefixes
+    name = name
+      .replace(/'s [Bb]irthday.*$/, '')
+      .replace(/^[Bb]irthday[:\s\-]+/i, '')
+      .replace(/\s*[Bb]irthday\s*$/i, '')
+      .trim()
+    if (!name) continue
+
+    const dtMatch = block.match(/^DTSTART[^:]*:([^\r\n]+)/im)
+    if (!dtMatch) continue
+    const dtStr = dtMatch[1].trim()
+
+    let month, day
+    if (dtStr.startsWith('--')) {
+      // --MMDD (no year format)
+      month = parseInt(dtStr.slice(2, 4), 10)
+      day = parseInt(dtStr.slice(4, 6), 10)
+    } else if (dtStr.length >= 8) {
+      // YYYYMMDD or YYYYMMDDTHHMMSSZ
+      month = parseInt(dtStr.slice(4, 6), 10)
+      day = parseInt(dtStr.slice(6, 8), 10)
+    } else {
+      continue
+    }
+
+    if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+      events.push({ name, birthday_month: month, birthday_day: day })
+    }
+  }
+  return events
+}
+
 export default function Dashboard() {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
@@ -32,6 +71,12 @@ export default function Dashboard() {
   const [error, setError] = useState('')
   const [savingTemplate, setSavingTemplate] = useState(false)
   const formRef = useRef(null)
+  const icsInputRef = useRef(null)
+
+  // Calendar import state
+  const [importPreview, setImportPreview] = useState(null) // null = modal closed
+  const [importSelections, setImportSelections] = useState({}) // index -> bool
+  const [importing, setImporting] = useState(false)
 
   useEffect(() => {
     loadProfile()
@@ -134,6 +179,46 @@ export default function Dashboard() {
   // Touch profiles.updated_at so the display page cache auto-invalidates
   const touchProfile = () =>
     supabase.from('profiles').update({ updated_at: new Date().toISOString() }).eq('id', user.id)
+
+  const handleICSFile = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = '' // reset so same file can be picked again
+    const reader = new FileReader()
+    reader.onload = (evt) => {
+      const parsed = parseICS(evt.target.result)
+      const existingNames = new Set(teamMembers.map(m => m.name.toLowerCase().trim()))
+      const preview = parsed.map(p => ({
+        ...p,
+        isDuplicate: existingNames.has(p.name.toLowerCase().trim()),
+      }))
+      const selections = {}
+      preview.forEach((p, i) => { selections[i] = !p.isDuplicate })
+      setImportPreview(preview)
+      setImportSelections(selections)
+    }
+    reader.readAsText(file)
+  }
+
+  const handleImport = async () => {
+    setImporting(true)
+    try {
+      const toInsert = importPreview
+        .filter((_, i) => importSelections[i])
+        .map(p => ({ name: p.name, birthday_month: p.birthday_month, birthday_day: p.birthday_day, user_id: user.id }))
+      if (toInsert.length > 0) {
+        const { error } = await supabase.from('team_members').insert(toInsert)
+        if (error) throw error
+        await touchProfile()
+        await loadTeamMembers()
+      }
+      setImportPreview(null)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setImporting(false)
+    }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -391,7 +476,7 @@ export default function Dashboard() {
 
         {/* Add Member Button */}
         {!isSupportMode && (
-          <div className="mb-6">
+          <div className="mb-6 flex flex-wrap gap-3">
             <button
               onClick={() => {
                 setShowAddForm(!showAddForm)
@@ -415,6 +500,24 @@ export default function Dashboard() {
                   Add Team Member
                 </>
               )}
+            </button>
+
+            {/* Calendar import */}
+            <input
+              ref={icsInputRef}
+              type="file"
+              accept=".ics"
+              className="hidden"
+              onChange={handleICSFile}
+            />
+            <button
+              onClick={() => icsInputRef.current?.click()}
+              className="bg-white border-2 border-indigo-300 text-indigo-700 text-lg px-8 py-4 rounded-xl font-semibold hover:bg-indigo-50 hover:border-indigo-500 transition-all duration-200 shadow-md flex items-center gap-2"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              Import from Calendar
             </button>
           </div>
         )}
@@ -721,6 +824,77 @@ export default function Dashboard() {
             </a>
           </div>
         </div>
+
+        {/* Calendar Import Modal */}
+        {importPreview && (
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col">
+              <div className="p-6 border-b border-gray-100">
+                <h2 className="text-2xl font-bold gradient-text mb-1">Import Birthdays</h2>
+                {importPreview.length === 0 ? (
+                  <p className="text-gray-500 text-sm">No birthdays found in this file. Make sure it's a calendar exported from Google Contacts, Apple Contacts, or similar.</p>
+                ) : (
+                  <p className="text-gray-500 text-sm">
+                    Found <strong>{importPreview.length}</strong> birthdays.
+                    Duplicates are unchecked — uncheck any you don't want to add.
+                  </p>
+                )}
+              </div>
+
+              {importPreview.length > 0 && (
+                <div className="overflow-y-auto flex-1 p-4 space-y-2">
+                  {importPreview.map((p, i) => (
+                    <label
+                      key={i}
+                      className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${
+                        importSelections[i] ? 'bg-indigo-50 border border-indigo-200' : 'bg-gray-50 border border-gray-200'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={!!importSelections[i]}
+                        onChange={e => setImportSelections(prev => ({ ...prev, [i]: e.target.checked }))}
+                        className="w-5 h-5 accent-indigo-600 flex-shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className={`font-semibold truncate ${importSelections[i] ? 'text-gray-800' : 'text-gray-400'}`}>{p.name}</p>
+                        <p className={`text-sm ${importSelections[i] ? 'text-indigo-600' : 'text-gray-400'}`}>
+                          {monthNames[p.birthday_month - 1]} {p.birthday_day}
+                        </p>
+                      </div>
+                      {p.isDuplicate && (
+                        <span className="flex-shrink-0 text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-1 rounded-full">
+                          Already added
+                        </span>
+                      )}
+                    </label>
+                  ))}
+                </div>
+              )}
+
+              <div className="p-6 border-t border-gray-100 flex gap-3">
+                {importPreview.length > 0 && (
+                  <button
+                    onClick={handleImport}
+                    disabled={importing || Object.values(importSelections).every(v => !v)}
+                    className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {importing
+                      ? 'Importing...'
+                      : `Import ${Object.values(importSelections).filter(Boolean).length} Birthday${Object.values(importSelections).filter(Boolean).length !== 1 ? 's' : ''}`
+                    }
+                  </button>
+                )}
+                <button
+                  onClick={() => setImportPreview(null)}
+                  className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Setup Guide */}
         <div className="bg-blue-50 rounded-2xl shadow-lg p-4 md:p-6 mt-8 border border-blue-200">
