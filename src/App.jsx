@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard'
 import Display from './pages/Display'
 import Admin from './pages/Admin'
 import ResetPassword from './pages/ResetPassword'
+import Share from './pages/Share'
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth()
@@ -48,6 +49,7 @@ function App() {
             }
           />
           <Route path="/display/:userId" element={<Display />} />
+          <Route path="/share" element={<Share />} />
         </Routes>
       </AuthProvider>
     </Router>
