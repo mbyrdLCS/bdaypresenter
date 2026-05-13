@@ -57,10 +57,10 @@ export default function RetroArcade({ mode, person, members, month, spotlightInd
   // ── Monthly ────────────────────────────────────────────────────────────────
   if (mode === 'monthly') {
     return (
-      <div className="min-h-screen flex flex-col relative overflow-hidden" style={bg}>
+      <div className="h-screen flex flex-col overflow-hidden" style={bg}>
         <div className="absolute inset-0 bg-black/60" />
 
-        <div className="relative z-10 px-16 py-12 flex flex-col min-h-screen">
+        <div className="relative z-10 px-16 py-10 flex flex-col h-full">
           <div className="mb-8">
             <h1 className="text-6xl font-black text-yellow-400 leading-tight uppercase tracking-wide"
                 style={{ textShadow: '3px 3px 0 #f97316' }}>

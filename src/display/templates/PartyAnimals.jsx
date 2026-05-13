@@ -41,8 +41,8 @@ export default function PartyAnimals({ mode, person, members, month, spotlightIn
   // ── Monthly ────────────────────────────────────────────────────────────────
   if (mode === 'monthly') {
     return (
-      <div className="min-h-screen flex flex-col relative overflow-hidden" style={bg}>
-        <div className="relative z-10 px-16 py-10 flex flex-col min-h-screen bg-white/60 backdrop-blur-sm">
+      <div className="h-screen flex flex-col overflow-hidden" style={bg}>
+        <div className="relative z-10 px-16 py-10 flex flex-col h-full bg-white/60 backdrop-blur-sm">
           <div className="mb-8 text-center">
             <h1 className="text-6xl font-black text-orange-500 leading-tight drop-shadow-sm">
               {monthNames[month - 1]} Birthdays

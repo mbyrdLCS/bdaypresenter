@@ -50,7 +50,7 @@ export default function MonthlyGrid({ members, cardBg, nameColor, dateColor }) {
                  'text-base'
 
   return (
-    <div className={`flex-1 grid ${cols} gap-4 min-h-0`}>
+    <div className={`flex-1 grid ${cols} gap-4 min-h-0`} style={{ gridAutoRows: '1fr' }}>
       {members.map(m => (
         <div
           key={m.id}

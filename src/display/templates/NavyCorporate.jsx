@@ -55,10 +55,10 @@ export default function NavyCorporate({ mode, person, members, month, spotlightI
   // ── Monthly ────────────────────────────────────────────────────────────────
   if (mode === 'monthly') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 to-blue-800 flex flex-col relative overflow-hidden">
+      <div className="h-screen bg-gradient-to-br from-blue-900 to-blue-800 flex flex-col overflow-hidden">
         <div className="absolute inset-0 opacity-5" style={stripeStyle} />
 
-        <div className="relative z-10 px-16 py-12 flex flex-col min-h-screen">
+        <div className="relative z-10 px-16 py-10 flex flex-col h-full">
           <div className="mb-10">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-1 h-10 bg-blue-400 rounded-full flex-shrink-0" />

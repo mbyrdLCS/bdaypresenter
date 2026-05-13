@@ -59,8 +59,8 @@ export default function BoldDramatic({ mode, person, members, month, spotlightIn
   // ── Monthly ────────────────────────────────────────────────────────────────
   if (mode === 'monthly') {
     return (
-      <div className="min-h-screen bg-gray-950 flex flex-col relative overflow-hidden">
-        <div className="relative z-10 px-16 py-12 flex flex-col min-h-screen">
+      <div className="h-screen bg-gray-950 flex flex-col overflow-hidden">
+        <div className="relative z-10 px-16 py-10 flex flex-col h-full">
           <div className="mb-10">
             <p className={`${accent} text-sm font-bold uppercase tracking-widest mb-3`}>This Month</p>
             <h1 className="text-6xl font-black text-white leading-tight">

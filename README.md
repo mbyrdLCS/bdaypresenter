@@ -312,6 +312,24 @@ birthday-celebration-app/
 4. Add/Edit variables
 5. Redeploy (or push to trigger auto-deploy)
 
+### Supabase Keep-Alive (Prevent Auto-Pause)
+
+Supabase free tier projects are paused after 7 days of inactivity. To prevent this, we use an external cron service to ping the database daily.
+
+**Endpoint:** `https://bdaypresenter.com/api/keep-alive`
+
+**Setup:**
+1. The keep-alive endpoint is at `api/keep-alive.js` - it makes a simple query to keep the database active
+2. We use [cron-job.org](https://cron-job.org) (free) to ping this endpoint daily
+3. Login to cron-job.org to view/edit the scheduled job named "Keep Bday alive"
+
+**To modify the cron schedule:**
+1. Go to [cron-job.org](https://cron-job.org) and log in
+2. Find the "Keep Bday alive" job
+3. Adjust the schedule as needed (currently set to daily at 3:00 AM)
+
+**Note:** Vercel's built-in cron jobs require a Pro plan. That's why we use the free external service instead.
+
 ## 🐛 Troubleshooting
 
 ### "Supabase credentials not found" warning

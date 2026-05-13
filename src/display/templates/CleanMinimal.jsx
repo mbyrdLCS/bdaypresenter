@@ -38,8 +38,8 @@ export default function CleanMinimal({ mode, person, members, month, spotlightIn
   // ── Monthly ────────────────────────────────────────────────────────────────
   if (mode === 'monthly') {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        <div className="px-16 py-12 flex flex-col min-h-screen">
+      <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
+        <div className="px-16 py-10 flex flex-col h-full">
           <div className="mb-10">
             <div className="w-8 h-0.5 bg-gray-900 mb-6" />
             <h1 className="text-5xl font-bold text-gray-900 leading-tight">

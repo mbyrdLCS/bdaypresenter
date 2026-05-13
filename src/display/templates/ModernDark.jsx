@@ -65,12 +65,12 @@ export default function ModernDark({ mode, person, members, month, spotlightInde
   // ── Monthly ────────────────────────────────────────────────────────────────
   if (mode === 'monthly') {
     return (
-      <div className={`min-h-screen bg-gradient-to-br ${theme.bg} flex flex-col relative overflow-hidden`}>
+      <div className={`h-screen bg-gradient-to-br ${theme.bg} flex flex-col overflow-hidden`}>
         <div className={`absolute -top-20 -right-16 w-64 h-64 ${theme.blob1} rounded-full opacity-60`} />
         <div className={`absolute -bottom-16 -left-16 w-56 h-56 ${theme.blob2} rounded-full opacity-50`} />
         <div className={`absolute top-1/2 -right-8 w-32 h-32 ${theme.blob2} rounded-full opacity-25`} />
 
-        <div className="relative z-10 px-16 py-12 flex flex-col min-h-screen">
+        <div className="relative z-10 px-16 py-10 flex flex-col h-full">
           <div className="mb-8">
             <h1 className={`text-6xl font-bold ${theme.text} leading-tight`}>
               {monthNames[month - 1]} Birthdays

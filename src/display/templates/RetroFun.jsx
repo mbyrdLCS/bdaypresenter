@@ -58,11 +58,11 @@ export default function RetroFun({ mode, person, members, month, spotlightIndex,
   // ── Monthly ────────────────────────────────────────────────────────────────
   if (mode === 'monthly') {
     return (
-      <div className={`min-h-screen bg-gradient-to-br ${gradient} flex flex-col relative overflow-hidden`}>
+      <div className={`h-screen bg-gradient-to-br ${gradient} flex flex-col overflow-hidden`}>
         <div className="absolute -top-20 -left-20 w-72 h-72 bg-white/10 rounded-full" />
         <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-white/10 rounded-full" />
 
-        <div className="relative z-10 px-16 py-12 flex flex-col min-h-screen">
+        <div className="relative z-10 px-16 py-10 flex flex-col h-full">
           <div className="mb-10">
             <h1 className="text-5xl font-black text-white leading-tight">
               {monthNames[month - 1]} Birthdays

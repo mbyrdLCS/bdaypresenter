@@ -91,8 +91,8 @@ export default function EmojiClassic({ mode, person, members, month, spotlightIn
                    'text-2xl'
 
     return (
-      <div className={`min-h-screen bg-gradient-to-br ${theme.bgGradient} flex flex-col`}>
-        <div className="px-16 py-10 flex flex-col min-h-screen">
+      <div className={`h-screen bg-gradient-to-br ${theme.bgGradient} flex flex-col overflow-hidden`}>
+        <div className="px-16 py-10 flex flex-col h-full">
           <div className="text-center mb-8">
             <div className="text-4xl mb-1">{theme.emoji}</div>
             <h1 className={`text-5xl font-bold ${theme.accent} mb-1`}>
@@ -101,7 +101,7 @@ export default function EmojiClassic({ mode, person, members, month, spotlightIn
             <p className="text-gray-500 text-lg">{theme.name}</p>
           </div>
 
-          <div className={`flex-1 grid ${cols} gap-4 min-h-0`}>
+          <div className={`flex-1 grid ${cols} gap-4 min-h-0`} style={{ gridAutoRows: '1fr' }}>
             {members.map(m => (
               <div key={m.id} className="bg-white rounded-2xl shadow-md flex flex-col items-center justify-center gap-2 p-6 min-h-0">
                 <span className={emojiSize}>🎂</span>

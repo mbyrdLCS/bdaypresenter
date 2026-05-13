@@ -53,10 +53,10 @@ export default function CakeExplosion({ mode, person, members, month, spotlightI
   // ── Monthly ────────────────────────────────────────────────────────────────
   if (mode === 'monthly') {
     return (
-      <div className="min-h-screen flex flex-col relative overflow-hidden" style={bg}>
+      <div className="h-screen flex flex-col overflow-hidden" style={bg}>
         <div className="absolute inset-0 bg-black/65" />
 
-        <div className="relative z-10 px-16 py-12 flex flex-col min-h-screen">
+        <div className="relative z-10 px-16 py-10 flex flex-col h-full">
           <div className="mb-8">
             <h1 className="text-6xl font-black text-white leading-tight">
               {monthNames[month - 1]} <span className="text-yellow-400">Birthdays</span>
