@@ -86,6 +86,19 @@ CREATE POLICY "Team members viewable for display"
   ON team_members FOR SELECT
   USING (true);
 
+-- Explicit grants required for Data API (supabase-js / PostgREST) access
+-- Required for new projects created after May 30, 2026 and all projects after Oct 30, 2026
+
+-- profiles grants
+GRANT SELECT ON public.profiles TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO service_role;
+
+-- team_members grants
+GRANT SELECT ON public.team_members TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.team_members TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.team_members TO service_role;
+
 -- Storage bucket for photos
 -- Run this in the Supabase dashboard Storage section:
 -- 1. Create a new bucket called "profile-photos"

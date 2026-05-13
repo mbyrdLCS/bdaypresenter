@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../services/supabase'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { TEMPLATES } from '../display/index'
 
 export default function Dashboard() {
   const { user, signOut } = useAuth()
@@ -29,6 +30,7 @@ export default function Dashboard() {
 
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
+  const [savingTemplate, setSavingTemplate] = useState(false)
   const formRef = useRef(null)
 
   useEffect(() => {
@@ -197,6 +199,22 @@ export default function Dashboard() {
     navigate('/login')
   }
 
+  const saveTemplate = async (templateId) => {
+    setSavingTemplate(templateId)
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ display_template: templateId })
+        .eq('id', user.id)
+      if (error) throw error
+      setProfile(prev => ({ ...prev, display_template: templateId }))
+    } catch (err) {
+      console.error('Error saving template:', err)
+    } finally {
+      setSavingTemplate(false)
+    }
+  }
+
   const displayUrl = profile ? `${window.location.origin}/display/${profile.display_url_slug}` : ''
 
   const monthNames = [
@@ -224,7 +242,9 @@ export default function Dashboard() {
       <header className="bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg">
         <div className="container mx-auto px-4 py-4 md:py-6 flex justify-between items-center gap-2">
           <div className="flex items-center gap-2 md:gap-3 min-w-0">
-            <span className="text-3xl md:text-4xl flex-shrink-0">🎂</span>
+            <svg className="w-8 h-8 md:w-10 md:h-10 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
             <h1 className="text-xl md:text-3xl font-bold text-white truncate">Birthday Presenter</h1>
           </div>
           <div className="flex items-center gap-2">
@@ -276,7 +296,9 @@ export default function Dashboard() {
         {/* Display URL Section */}
         <div className="bg-gradient-to-br from-white to-indigo-50 rounded-2xl shadow-xl p-4 md:p-8 mb-8 border border-indigo-100 fade-in">
           <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
-            <span className="text-2xl md:text-3xl">🔗</span>
+            <svg className="w-6 h-6 md:w-7 md:h-7 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+            </svg>
             <h2 className="text-xl md:text-2xl font-bold gradient-text">Your Display URL</h2>
           </div>
           <p className="text-gray-700 mb-2 text-sm md:text-lg">
@@ -303,8 +325,7 @@ export default function Dashboard() {
                 <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                 </svg>
-                <span className="hidden sm:inline">Copy</span>
-                <span className="sm:hidden">Copy</span>
+                Copy URL
               </button>
               <a
                 href={displayUrl}
@@ -319,6 +340,46 @@ export default function Dashboard() {
                 Preview
               </a>
             </div>
+
+            {/* How to add + SignPresenter CTA */}
+            <div className="mt-4 flex flex-col sm:flex-row gap-3">
+              <a
+                href="#signpresenter-setup"
+                className="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+              >
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                How to add this to SignPresenter
+              </a>
+            </div>
+          </div>
+
+          {/* No account CTA */}
+          <div className="mt-5 pt-5 border-t border-indigo-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <p className="text-gray-600 text-sm">
+              Don't have a SignPresenter account?{' '}
+              <a
+                href="https://www.signpresenter.com/#contact-form"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-indigo-600 hover:text-indigo-800 font-semibold underline underline-offset-2"
+              >
+                Make one here
+              </a>
+              {' '}— free to try for 30 days, only <strong className="text-indigo-700">$10/month</strong> after that!
+            </p>
+            <a
+              href="https://www.signpresenter.com/#contact-form"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-shrink-0 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+              Get SignPresenter
+            </a>
           </div>
         </div>
 
@@ -356,7 +417,12 @@ export default function Dashboard() {
         {showAddForm && (
           <div ref={formRef} className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100 fade-in">
             <div className="flex items-center gap-3 mb-6">
-              <span className="text-3xl">{editingMember ? '✏️' : '➕'}</span>
+              <svg className="w-7 h-7 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {editingMember
+                  ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                }
+              </svg>
               <h3 className="text-2xl font-bold gradient-text">
                 {editingMember ? 'Edit Team Member' : 'Add New Team Member'}
               </h3>
@@ -469,7 +535,9 @@ export default function Dashboard() {
         {/* Team Members List */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
           <div className="flex items-center gap-3 mb-6">
-            <span className="text-3xl">👥</span>
+            <svg className="w-7 h-7 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
             <h3 className="text-2xl font-bold gradient-text">
               Team Members ({teamMembers.length})
             </h3>
@@ -477,7 +545,11 @@ export default function Dashboard() {
 
           {teamMembers.length === 0 ? (
             <div className="text-center py-16">
-              <div className="text-6xl mb-4">🎂</div>
+              <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-indigo-300" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
               <p className="text-xl text-gray-500 mb-2">
                 No team members yet
               </p>
@@ -504,7 +576,9 @@ export default function Dashboard() {
                     </div>
                   ) : (
                     <div className="w-full h-48 md:h-56 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl mb-3 md:mb-4 flex items-center justify-center">
-                      <span className="text-5xl md:text-6xl">🎂</span>
+                      <svg className="w-20 h-20 text-indigo-300" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                      </svg>
                     </div>
                   )}
                   <h4 className="font-bold text-lg md:text-xl text-gray-800 mb-2">{member.name}</h4>
@@ -544,8 +618,77 @@ export default function Dashboard() {
           )}
         </div>
 
+        {/* Template Picker */}
+        {!isSupportMode && (
+          <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 mt-8 mb-8 border border-gray-100 fade-in">
+            <div className="flex items-center gap-3 mb-2">
+              <svg className="w-6 h-6 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+              </svg>
+              <h2 className="text-xl md:text-2xl font-bold gradient-text">Display Template</h2>
+            </div>
+            <p className="text-gray-500 text-sm mb-6">Choose how your birthday display looks on screen. Changes take effect immediately.</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {Object.values(TEMPLATES).map((tmpl) => {
+                const isSelected = (profile?.display_template || 'modern') === tmpl.id
+                const isSaving = savingTemplate === tmpl.id
+                return (
+                  <div
+                    key={tmpl.id}
+                    onClick={() => !isSaving && saveTemplate(tmpl.id)}
+                    className={`rounded-xl overflow-hidden border-2 cursor-pointer transition-all duration-200 hover:shadow-md ${
+                      isSelected ? 'border-indigo-500 ring-2 ring-indigo-200 shadow-md' : 'border-gray-200 hover:border-indigo-300'
+                    }`}
+                  >
+                    {/* Visual thumbnail */}
+                    <div className="h-24 relative overflow-hidden">
+                      <tmpl.Thumb />
+                      {/* Selected checkmark */}
+                      {isSelected && (
+                        <div className="absolute top-2 right-2 w-6 h-6 bg-indigo-600 rounded-full flex items-center justify-center shadow-md">
+                          <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      )}
+                      {/* Saving indicator */}
+                      {isSaving && (
+                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                          <svg className="animate-spin w-5 h-5 text-white" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                    {/* Label */}
+                    <div className="p-3 bg-white">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className={`font-semibold text-sm truncate ${isSelected ? 'text-indigo-700' : 'text-gray-800'}`}>{tmpl.label}</p>
+                          <p className="text-gray-400 text-xs truncate">{tmpl.description}</p>
+                        </div>
+                        {/* Preview link */}
+                        <a
+                          href={`${displayUrl}?template=${tmpl.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          className="flex-shrink-0 text-xs text-indigo-500 hover:text-indigo-700 font-medium border border-indigo-200 hover:border-indigo-400 px-2 py-1 rounded-lg transition-colors"
+                        >
+                          Preview
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
         {/* SignPresenter Branding */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mt-8 border border-gray-100">
+        <div id="signpresenter-setup" className="bg-white rounded-2xl shadow-xl p-8 mt-8 border border-gray-100">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex flex-col md:flex-row items-center gap-4">
               <img
@@ -580,7 +723,9 @@ export default function Dashboard() {
             className="w-full flex items-center justify-between text-left"
           >
             <div className="flex items-center gap-3">
-              <span className="text-2xl md:text-3xl">📺</span>
+              <svg className="w-7 h-7 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
               <div>
                 <h3 className="text-lg md:text-xl font-bold text-gray-800">
                   How to Display on Your TV
@@ -649,7 +794,9 @@ export default function Dashboard() {
 
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 md:p-6 border-2 border-green-200">
                 <div className="flex items-start gap-3">
-                  <span className="text-3xl">✨</span>
+                  <svg className="w-7 h-7 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                   <div>
                     <h4 className="text-lg font-bold text-green-800 mb-2">That's it!</h4>
                     <p className="text-gray-700">
