@@ -77,6 +77,7 @@ export default function Dashboard() {
   const [importPreview, setImportPreview] = useState(null) // null = modal closed
   const [importSelections, setImportSelections] = useState({}) // index -> bool
   const [importing, setImporting] = useState(false)
+  const [showICSHelp, setShowICSHelp] = useState(false)
 
   useEffect(() => {
     loadProfile()
@@ -519,6 +520,73 @@ export default function Dashboard() {
               </svg>
               Import from Calendar
             </button>
+          </div>
+        )}
+
+        {/* ICS Help Panel */}
+        {!isSupportMode && (
+          <div className="mb-6">
+            <button
+              onClick={() => setShowICSHelp(!showICSHelp)}
+              className="flex items-center gap-1.5 text-sm text-indigo-500 hover:text-indigo-700 font-medium transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              How do I get an .ics file?
+              <svg className={`w-4 h-4 transition-transform ${showICSHelp ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {showICSHelp && (
+              <div className="mt-3 bg-white rounded-2xl border border-indigo-100 shadow-md p-5 fade-in">
+                <p className="text-sm text-gray-500 mb-4">Export your birthday calendar from any of these apps and upload the .ics file:</p>
+                <div className="space-y-4">
+
+                  <div className="flex gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-base">🗓️</span>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-800 text-sm">Google Calendar</p>
+                      <p className="text-gray-500 text-sm">Settings (⚙️) → <strong>Import &amp; Export</strong> → <strong>Export</strong> → downloads a .zip — open it and find <em>Birthdays.ics</em></p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-base">🍎</span>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-800 text-sm">Apple Calendar</p>
+                      <p className="text-gray-500 text-sm">Right-click the <strong>Birthdays</strong> calendar in the sidebar → <strong>Export…</strong> → save the .ics file</p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-base">📧</span>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-800 text-sm">Outlook</p>
+                      <p className="text-gray-500 text-sm"><strong>File</strong> → <strong>Open &amp; Export</strong> → <strong>Import/Export</strong> → <strong>Export to a file</strong> → <strong>iCalendar (.ics)</strong> → select your calendar</p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-base">👥</span>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-800 text-sm">Google Contacts (birthdays only)</p>
+                      <p className="text-gray-500 text-sm">Google automatically creates a <strong>Birthdays</strong> calendar from your contacts. Export it from Google Calendar using the steps above.</p>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            )}
           </div>
         )}
 
